@@ -7,6 +7,7 @@ public class Application {
     private String platforms;
     private String[] links;
     private String price;
+    private String status;
     
     // Getters and Setters
     // Name

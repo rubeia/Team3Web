@@ -1,51 +1,35 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
- 
-<%@page import="apprepo.Application"%> 
-<%@page import="java.util.ArrayList"%>    
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Application Repository</title>
+    <meta charset="UTF-8">
+    <title>Outstanding Requests</title>
 </head>
 <body>
-    <form action="FilterServlet" method="post">
-        <input type="text" name="query" value="${query}" placeholder="Filter...">
-        <input type="submit" value="Filter">
-    </form>    
-    <form action="FilterServlet" method="post">
-    	<input type="submit" value="SortByAppName">
-    </form>
-    <h1>Application Repository</h1>
-    <form method = "GET" action = "NextGenRentServlet" >
-        
-    <table border="1">
+    <h1>Outstanding Requests</h1>
+    <table>
         <tr>
             <th>Name</th>
-            <th>Description</th>
-            <th>Organization</th>
-            <th>Platforms</th>
-            <th>Links</th>
-            <th>Price</th>
+            <th>Requester</th>
+            <th>Date</th>
+            <th>Comments</th>
+            <th>Actions</th>
         </tr>
-         
-        <%ArrayList<Application> appList =  
-            (ArrayList<Application>)session.getAttribute("applications"); 
-        for(Application app:appList){%>
-     
+        <c:forEach var="app" items="${applications}">
             <tr>
-          
-                <td><%=app.getName()%></td>
-                <td><%=app.getDescription()%></td>
-                <td><%=app.getOrganization()%></td>
-                <td><%=app.getPlatforms()%></td>
-                <td><%=app.getLinks()%></td>
-                <td><%=app.getPrice()%></td>
+                <td>${app.name}</td>
+                <td>${app.requester}</td>
+                <td>${app.requestDate}</td>
+                <td>
+                    <form action="NextGenRentServlet" method="post">
+                        <input type="hidden" name="appId" value="${app.id}">
+                        <textarea name="comment"></textarea>
+                        <input type="submit" name="action" value="Approve">
+                        <input type="submit" name="action" value="Deny">
+                    </form>
+                </td>
             </tr>
-           <%}%> 
-        
+        </c:forEach>
     </table>
-    </form>
 </body>
 </html>

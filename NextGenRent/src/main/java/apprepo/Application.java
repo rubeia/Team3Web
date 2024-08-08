@@ -1,3 +1,4 @@
+
 package apprepo;
 
 public class Application {
@@ -7,50 +8,52 @@ public class Application {
     private String platforms;
     private String[] links;
     private String price;
-    private String status;
-    
-    // Getters and Setters
-    // Name
+    private String status; // New field for status
+
+    // Getters and setters
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // Other getters and setters
     public String getName() {
         return name;
     }
     public void setName(String name) {
         this.name = name;
     }
-    
-    // Description
+
     public String getDescription() {
         return description;
     }
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    // Organization
+
     public String getOrganization() {
         return organization;
     }
     public void setOrganization(String organization) {
         this.organization = organization;
     }
-    
-    // Platforms
+
     public String getPlatforms() {
         return platforms;
     }
     public void setPlatforms(String platforms) {
         this.platforms = platforms;
     }
-    
-    // Links
+
     public String[] getLinks() {
         return links;
     }
     public void setLinks(String[] links) {
         this.links = links;
     }
-    
-    // Price
+
     public String getPrice() {
         return price;
     }

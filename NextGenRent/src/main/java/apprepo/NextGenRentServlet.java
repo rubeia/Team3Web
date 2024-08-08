@@ -132,3 +132,31 @@ List<Application> applications = new ArrayList<>();
 	}
 
 }
+
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String action = request.getParameter("action");
+    if ("viewBalance".equals(action)) {
+        // Assuming user authentication is done and user ID is stored in session
+        String userId = (String) request.getSession().getAttribute("userId");
+        // Fetch account balance from the database (pseudo code)
+        double accountBalance = fetchAccountBalance(userId);
+        // Set the account balance as a request attribute
+        request.setAttribute("accountBalance", accountBalance);
+        // Forward to the JSP page
+        request.getRequestDispatcher("/accountBalance.jsp").forward(request, response);
+    } else {
+        // Fetch outstanding requests (pseudo code)
+        List<Application> applications = fetchOutstandingRequests();
+        // Set applications as request attribute
+        request.setAttribute("applications", applications);
+        // Forward to JSP page
+        request.getRequestDispatcher("/outstandingRequests.jsp").forward(request, response);
+    }
+}
+
+// Method to fetch outstanding requests (pseudo code)
+private List<Application> fetchOutstandingRequests() {
+    // Logic to fetch applications with status "standby" from the database
+    return new ArrayList<>(); // Example return value
+}
+

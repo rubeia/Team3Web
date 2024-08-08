@@ -1,12 +1,7 @@
-
 package apprepo;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,19 +10,99 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/NextGenRentServlet")
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class NextGenRentServlet
+ */
 public class NextGenRentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    ServletConfig configNextGen;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Fetch outstanding requests
-        List<Application> applications = fetchOutstandingRequests();
-        // Set applications as request attribute
-        request.setAttribute("applications", applications);
-        // Forward to JSP page
-        request.getRequestDispatcher("/outstandingRequests.jsp").forward(request, response);
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public NextGenRentServlet() {
+        super();
+        // TODO Auto-generated constructor stub
     }
 
+    /**
+     * @see Servlet#init(ServletConfig)
+     */
+    public void init(ServletConfig config) throws ServletException {
+        configNextGen = config;
+    }
+
+    /**
+     * @see Servlet#getServletConfig()
+     */
+    public ServletConfig getServletConfig() {
+        return configNextGen;
+    }
+
+    /**
+     * @see Servlet#getServletInfo()
+     */
+    public String getServletInfo() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("outstandingRequests".equals(action)) {
+            // Fetch outstanding requests
+            List<Application> applications = fetchOutstandingRequests();
+            // Set applications as request attribute
+            request.setAttribute("applications", applications);
+            // Forward to JSP page
+            request.getRequestDispatcher("/outstandingRequests.jsp").forward(request, response);
+        } else {
+            // Default action: Read data from the file and display applications
+            List<Application> applications = new ArrayList<>();
+            String filePath = getServletContext().getRealPath("/data/applications.txt");
+            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                String line;
+                Application app = null;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("Name:")) {
+                        app = new Application();
+                        app.setName(line.substring(6).trim());
+                    } else if (line.startsWith("Description:")) {
+                        app.setDescription(line.substring(13).trim());
+                    } else if (line.startsWith("Organization:")) {
+                        app.setOrganization(line.substring(14).trim());
+                    } else if (line.startsWith("Platforms:")) {
+                        app.setPlatforms(line.substring(10).trim());
+                    } else if (line.startsWith("Links:")) {
+                        String linksStr = line.substring(7).trim();
+                        String[] linksArray = linksStr.substring(1, linksStr.length() - 1).split(", ");
+                        app.setLinks(linksArray);
+                    } else if (line.startsWith("Price:")) {
+                        app.setPrice(line.substring(7).trim());
+                        applications.add(app);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            request.getSession().setAttribute("applications", applications);
+            request.getRequestDispatcher("/displayApplications.jsp").forward(request, response);
+        }
+    }
+
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         String appId = request.getParameter("appId");
@@ -40,55 +115,25 @@ public class NextGenRentServlet extends HttpServlet {
             // Deny application with comment
             denyApplication(appId, comment);
         } else {
-            // Retrieve form data
-            String externalLink = request.getParameter("externalLink");
-            // Process and store the external link
-            storeExternalLink(externalLink);
-            // Create application object
-            Application app = new Application();
-            app.setName(request.getParameter("name"));
-            app.setDescription(request.getParameter("description"));
-            app.setOrganization(request.getParameter("organization"));
-            app.setPlatforms(request.getParameter("platforms"));
-            app.setLinks(request.getParameterValues("links"));
-            app.setPrice(request.getParameter("price"));
-            app.setStatus("standby"); // Set status to standby
-
-            // Save application
-            saveApplication(app);
-
-            // Redirect or forward as necessary
-            response.sendRedirect("success.jsp");
+            // Existing POST logic
+            // TODO Auto-generated method stub
+            // doGet(request, response);
         }
     }
 
-    // Method to fetch outstanding requests
     private List<Application> fetchOutstandingRequests() {
         // Logic to fetch applications with status "standby" from the database
         return new ArrayList<>(); // Example return value
     }
 
-    // Method to approve application with comment
     private void approveApplication(String appId, String comment) {
         updateApplicationStatus(appId, "approved", comment);
     }
 
-    // Method to deny application with comment
     private void denyApplication(String appId, String comment) {
         updateApplicationStatus(appId, "denied", comment);
     }
 
-    // Method to store the external link
-    private void storeExternalLink(String externalLink) {
-        // Logic to store the link in the database
-    }
-
-    // Method to save the application
-    private void saveApplication(Application app) {
-        // Logic to save application in the database
-    }
-
-    // Method to update application status with comment
     private void updateApplicationStatus(String appId, String status, String comment) {
         Connection conn = null;
         PreparedStatement pstmt = null;

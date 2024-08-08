@@ -100,8 +100,35 @@ List<Application> applications = new ArrayList<>();
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//doGet(request, response);
+		String action = request.getParameter("action");
+    		String appId = request.getParameter("appId");
+    		String comment = request.getParameter("comment");
+    		if ("Approve".equals(action)) {
+        		// Approve application with comment
+        		approveApplication(appId, comment);
+    		} else if ("Deny".equals(action)) {
+        		// Deny application with comment
+        		denyApplication(appId, comment);
+    		} else {
+        		// Retrieve form data
+        		String externalLink = request.getParameter("externalLink");
+        		// Process and store the external link (pseudo code)
+        		storeExternalLink(externalLink);
+        		// Create application object
+        		Application app = new Application();
+        		app.setName(request.getParameter("name"));
+        		app.setDescription(request.getParameter("description"));
+        		app.setOrganization(request.getParameter("organization"));
+        		app.setPlatforms(request.getParameter("platforms"));
+        		app.setLinks(request.getParameterValues("links"));
+        		app.setPrice(request.getParameter("price"));
+        		app.setStatus("standby"); // Set status to standby
+
+        		// Save application (pseudo code)
+        		saveApplication(app);
+
+        		// Redirect or forward as necessary
+        		response.sendRedirect("success.jsp");
 	}
 
 }
